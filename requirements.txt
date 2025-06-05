@@ -3,3 +3,5 @@ qrcode
 python-pptx
 Pillow
 PyMuPDF
+transformers
+torch

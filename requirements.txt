@@ -6,4 +6,4 @@ PyMuPDF
 transformers==4.29.2
 torch==2.0.1
 PyPDF2
-tokenizers
+tokenizers>=0.13.2

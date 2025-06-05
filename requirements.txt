@@ -3,7 +3,5 @@ qrcode
 python-pptx
 Pillow
 PyMuPDF
-transformers==4.29.2
-torch==2.0.1
+googletrans==4.0.0-rc1
 PyPDF2
-tokenizers>=0.13.2

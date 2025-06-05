@@ -1,4 +1,5 @@
 streamlit
+qrcode
 python-pptx
 Pillow
 PyMuPDF

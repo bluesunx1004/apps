@@ -19,9 +19,8 @@ st.markdown("""
 사이드바에서 원하는 기능을 선택해 주세요 👇
 """)
 
-# 이미지 (아이콘 등)
-st.image("https://cdn-icons-png.flaticon.com/512/535/535234.png", width=120)
+# 예쁜 아이콘 이미지 (Flat icon style)
+st.image("https://cdn-icons-png.flaticon.com/512/3500/3500833.png", width=120)
 
 st.markdown("---")
-st.info("🔧 새로운 기능이 계속 추가될 예정입니다. 즐겨찾기 해두시면 편리하게 이용하실 수 있어요!")
-
+st.info("💡 새로운 기능이 지속적으로 추가될 예정입니다. 즐겨찾기 해두시면 더 편리하게 사용하실 수 있어요!")

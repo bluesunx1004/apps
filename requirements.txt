@@ -5,3 +5,7 @@ Pillow
 PyMuPDF
 googletrans==4.0.0-rc1
 PyPDF2
+transformers==4.29.2
+torch==2.0.1
+tokenizers>=0.13.2
+sentencepiece

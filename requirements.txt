@@ -3,6 +3,6 @@ qrcode
 python-pptx
 Pillow
 PyMuPDF
-transformers
-torch
+transformers==4.29.2
+torch==2.0.1
 PyPDF2

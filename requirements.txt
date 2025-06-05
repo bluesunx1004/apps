@@ -5,3 +5,4 @@ Pillow
 PyMuPDF
 transformers
 torch
+PyPDF2

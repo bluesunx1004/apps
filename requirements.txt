@@ -11,4 +11,3 @@ tokenizers>=0.13.2
 sentencepiece
 requests
 beautifulsoup4
-py-hanspell

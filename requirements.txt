@@ -12,6 +12,5 @@ sentencepiece
 requests
 beautifulsoup4
 opencv-python
-face_recognition
 numpy
 Pillow

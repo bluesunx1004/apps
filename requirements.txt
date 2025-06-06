@@ -11,4 +11,4 @@ tokenizers>=0.13.2
 sentencepiece
 requests
 beautifulsoup4
-git+https://github.com/azure77/pnu-korean-spell-checker.git
+

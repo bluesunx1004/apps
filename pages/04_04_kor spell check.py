@@ -1,31 +1,23 @@
 import streamlit as st
-import requests
-from bs4 import BeautifulSoup
+from hanspell import spell_checker
 
-st.title("📝 맞춤법 검사기 (부산대 기반 웹 요청)")
+st.title("📝 한글 맞춤법 검사기")
 
-text = st.text_area("문장을 입력하세요:", height=150)
+user_input = st.text_area("검사할 문장을 입력하세요:", height=150)
 
-if st.button("검사하기"):
-    if text.strip():
-        with st.spinner("검사 중입니다..."):
-            try:
-                res = requests.post(
-                    "https://speller.cs.pusan.ac.kr/results",
-                    data={"text1": text},
-                    timeout=10
-                )
-                soup = BeautifulSoup(res.text, "html.parser")
-                suggestions = soup.select("table td > span.red")
-
-                if suggestions:
-                    st.success("✔️ 교정 제안 있음:")
-                    for i, s in enumerate(suggestions, start=1):
-                        st.markdown(f"**{i}.** {s.text}")
-                else:
-                    st.success("🎉 문장에서 교정할 부분이 없습니다!")
-
-            except Exception as e:
-                st.error(f"오류 발생: {e}")
+if st.button("맞춤법 검사"):
+    if user_input.strip():
+        try:
+            result = spell_checker.check(user_input)
+            st.markdown("✅ **검사 결과:**")
+            st.write(result.checked)
+            st.markdown("🔍 **오류 통계:**")
+            st.json({
+                "맞춤법 오류": result.errors,
+                "원문": result.original,
+                "수정된 문장": result.checked
+            })
+        except Exception as e:
+            st.error(f"오류가 발생했습니다: {e}")
     else:
         st.warning("문장을 입력해주세요.")

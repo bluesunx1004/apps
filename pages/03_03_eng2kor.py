@@ -25,6 +25,8 @@ elif option == "PDF 파일 업로드":
         except Exception as e:
             st.error(f"PDF 텍스트 추출 실패: {e}")
 
+# ...
+
 if st.button("🔄 번역하기"):
     if input_text.strip():
         with st.spinner("번역 중입니다... ⏳"):
@@ -33,16 +35,13 @@ if st.button("🔄 번역하기"):
         st.success("✅ 번역 완료!")
         st.text_area("📜 번역 결과 (한국어)", value=translated_text, height=300)
 
-        # 번역 결과 다운로드
-        txt_buffer = StringIO()
-        txt_buffer.write(translated_text)
-        txt_buffer.seek(0)
-
+        # 텍스트를 바로 다운로드 버튼에 전달
         st.download_button(
             label="📥 번역 결과 텍스트 다운로드",
-            data=txt_buffer,
+            data=translated_text,
             file_name="translated_result.txt",
             mime="text/plain"
         )
     else:
         st.warning("번역할 텍스트를 입력하거나 PDF를 업로드 해주세요.")
+

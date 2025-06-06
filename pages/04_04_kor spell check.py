@@ -1,25 +1,51 @@
 import streamlit as st
-from hanspell import spell_checker
+import requests
+from bs4 import BeautifulSoup
 
-st.title("🇰🇷 한글 맞춤법 검사기 ✏️")
-st.write("텍스트를 입력하면 맞춤법과 문법 오류를 자동으로 교정해드려요!")
+def check_spelling(text):
+    url = "https://speller.cs.pusan.ac.kr/results"
+    data = {
+        "text1": text
+    }
 
-text = st.text_area("검사할 텍스트를 입력하세요:", height=200)
+    response = requests.post(url, data=data)
+    response.encoding = 'utf-8'
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+    results = []
+
+    for err in soup.select(".tdReplace"):
+        original = err.find_previous_sibling("td").text.strip()
+        corrected = err.text.strip()
+        info = err.find_next_sibling("td").text.strip()
+        results.append({
+            "original": original,
+            "corrected": corrected,
+            "info": info
+        })
+
+    return results
+
+# Streamlit UI
+st.title("📝 한글 맞춤법 검사기 (부산대 기반)")
+st.write("아래에 문장을 입력하면 맞춤법을 검사하고 교정된 표현을 제안해줍니다.")
+
+text = st.text_area("검사할 문장을 입력하세요:", height=200)
 
 if st.button("✅ 맞춤법 검사"):
-    if text.strip():
-        with st.spinner("검사 중입니다... 🔍"):
-            result = spell_checker.check(text)
-            corrected = result.checked
-        st.success("✔️ 맞춤법 검사 완료!")
-        st.subheader("📝 교정된 문장:")
-        st.text_area("결과", corrected, height=200)
-        
-        st.download_button(
-            label="📥 결과 텍스트 다운로드",
-            data=corrected,
-            file_name="corrected_text.txt",
-            mime="text/plain"
-        )
+    if not text.strip():
+        st.warning("문장을 입력해주세요.")
     else:
-        st.warning("검사할 텍스트를 입력해주세요.")
+        with st.spinner("검사 중입니다..."):
+            result = check_spelling(text)
+        if not result:
+            st.success("맞춤법 오류를 찾지 못했습니다! 🎉")
+        else:
+            st.warning(f"총 {len(result)}개의 교정 제안이 있습니다.")
+            for i, item in enumerate(result, 1):
+                st.markdown(f"""
+                **{i}. 원문**: `{item['original']}`  
+                **→ 수정안**: `{item['corrected']}`  
+                🛈 _{item['info']}_  
+                ---
+                """)

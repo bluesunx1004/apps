@@ -1,46 +1,36 @@
 import streamlit as st
 import cv2
 import numpy as np
+import face_recognition
 from PIL import Image
 
-st.title("🕵️‍♂️ 얼굴 블러 처리기 (자동 감지)")
+st.set_page_config(page_title="얼굴 블러 처리기", layout="centered")
+st.title("📸 얼굴 블러 처리기")
+st.write("업로드된 이미지에서 얼굴을 감지하고 자동으로 블러 처리합니다.")
 
 uploaded_file = st.file_uploader("이미지를 업로드하세요", type=["jpg", "jpeg", "png"])
 
+def blur_faces(image):
+    # 이미지 로드 및 RGB 변환
+    image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    face_locations = face_recognition.face_locations(image_rgb)
+
+    for top, right, bottom, left in face_locations:
+        # 얼굴 영역 잘라내기
+        face_region = image[top:bottom, left:right]
+        # 얼굴 블러 처리
+        face_region = cv2.GaussianBlur(face_region, (99, 99), 30)
+        # 원본 이미지에 블러 처리된 얼굴 붙이기
+        image[top:bottom, left:right] = face_region
+
+    return image
+
 if uploaded_file is not None:
-    # 이미지 로드
-    image = Image.open(uploaded_file).convert('RGB')
-    img_array = np.array(image)
+    image = Image.open(uploaded_file)
+    image_np = np.array(image.convert("RGB"))
+    image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
 
-    # OpenCV용 이미지로 변환
-    img_cv = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+    result_image = blur_faces(image_bgr)
+    result_image_rgb = cv2.cvtColor(result_image, cv2.COLOR_BGR2RGB)
 
-    # 얼굴 인식 모델 로드 (Haar Cascade)
-    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-
-    # 얼굴 감지
-    gray = cv2.cvtColor(img_cv, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5)
-
-    st.write(f"감지된 얼굴 수: {len(faces)}")
-
-    # 얼굴 블러 처리
-    for (x, y, w, h) in faces:
-        face_region = img_cv[y:y+h, x:x+w]
-        blurred_face = cv2.GaussianBlur(face_region, (99, 99), 30)
-        img_cv[y:y+h, x:x+w] = blurred_face
-
-    # 결과 이미지 RGB로 다시 변환
-    result_img = cv2.cvtColor(img_cv, cv2.COLOR_BGR2RGB)
-
-    # 표시
-    st.image(result_img, caption="블러 처리된 이미지", use_column_width=True)
-
-    # 다운로드
-    result_pil = Image.fromarray(result_img)
-    st.download_button(
-        label="📥 이미지 다운로드",
-        data=cv2.imencode('.png', cv2.cvtColor(result_img, cv2.COLOR_RGB2BGR))[1].tobytes(),
-        file_name="blurred_faces.png",
-        mime="image/png"
-    )
+    st.image(result_image_rgb, caption="블러 처리된 이미지", use_column_width=True)

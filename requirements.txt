@@ -12,3 +12,4 @@ sentencepiece
 requests
 beautifulsoup4
 git+https://github.com/ssut/py-hanspell.git
+pnu-korean-spell-checker

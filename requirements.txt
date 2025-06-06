@@ -11,6 +11,7 @@ tokenizers>=0.13.2
 sentencepiece
 requests
 beautifulsoup4
-opencv-python-headless
+opencv-python
+face_recognition
 numpy
 Pillow

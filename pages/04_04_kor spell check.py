@@ -2,28 +2,30 @@ import streamlit as st
 import requests
 from bs4 import BeautifulSoup
 
-st.title("📝 네이버 맞춤법 검사기 (Streamlit)")
+st.title("📝 맞춤법 검사기 (부산대 기반 웹 요청)")
 
-user_input = st.text_area("문장을 입력하세요:", height=150)
+text = st.text_area("문장을 입력하세요:", height=150)
 
 if st.button("검사하기"):
-    if user_input.strip():
-        with st.spinner("맞춤법 검사 중..."):
+    if text.strip():
+        with st.spinner("검사 중입니다..."):
             try:
-                url = "https://search.naver.com/search.naver"
-                params = {
-                    "query": f"{user_input} 맞춤법 검사"
-                }
-                headers = {
-                    "User-Agent": "Mozilla/5.0"
-                }
-                response = requests.get(url, params=params, headers=headers)
-                soup = BeautifulSoup(response.text, "html.parser")
+                res = requests.post(
+                    "https://speller.cs.pusan.ac.kr/results",
+                    data={"text1": text},
+                    timeout=10
+                )
+                soup = BeautifulSoup(res.text, "html.parser")
+                suggestions = soup.select("table td > span.red")
 
-                result = soup.select_one("div._check_result_box > div:nth-of-type(1)").get_text(strip=True)
-                st.success("✔️ 검사 결과")
-                st.markdown(f"**수정 제안:**  \n{result}")
+                if suggestions:
+                    st.success("✔️ 교정 제안 있음:")
+                    for i, s in enumerate(suggestions, start=1):
+                        st.markdown(f"**{i}.** {s.text}")
+                else:
+                    st.success("🎉 문장에서 교정할 부분이 없습니다!")
+
             except Exception as e:
-                st.error(f"검사 중 오류 발생: {e}")
+                st.error(f"오류 발생: {e}")
     else:
-        st.warning("검사할 문장을 입력해주세요.")
+        st.warning("문장을 입력해주세요.")

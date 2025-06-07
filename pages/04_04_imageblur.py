@@ -3,12 +3,15 @@ import cv2
 import numpy as np
 from PIL import Image
 import io
+import os
 
-# DNN 모델 로드
-MODEL_FILE = "res10_300x300_ssd_iter_140000.caffemodel"
-CONFIG_FILE = "deploy.prototxt.txt"
+# 현재 파일 위치 기준 경로 계산
+base_dir = os.path.dirname(os.path.abspath(__file__))
+MODEL_FILE = os.path.join(base_dir, "res10_300x300_ssd_iter_140000.caffemodel")
+CONFIG_FILE = os.path.join(base_dir, "deploy.prototxt.txt")
 
 net = cv2.dnn.readNetFromCaffe(CONFIG_FILE, MODEL_FILE)
+
 
 st.title("DNN 기반 얼굴 블러 처리 앱")
 

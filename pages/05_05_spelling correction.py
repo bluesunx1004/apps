@@ -1,37 +1,30 @@
 import streamlit as st
-import openai
-import os
+from hanspell import spell_checker
+from pykospacing import Spacing
 
-# Streamlit 인터페이스
-st.title("🧠 AI 한국어 맞춤법 검사기")
+spacing = Spacing()
 
-openai_api_key = st.text_input("🔑 OpenAI API 키를 입력하세요", type="password")
+st.title("📝 한국어 맞춤법 + 띄어쓰기 보정기")
 
-text = st.text_area("검사할 문장을 입력하세요:", height=200)
+text = st.text_area("문장을 입력하세요:", height=200)
 
 if st.button("검사하기"):
-    if not openai_api_key or not text.strip():
-        st.warning("API 키와 문장을 모두 입력해주세요.")
+    if not text.strip():
+        st.warning("문장을 입력해주세요.")
     else:
         try:
-            openai.api_key = openai_api_key
+            # 1단계: 띄어쓰기 보정
+            spaced = spacing(text)
 
-            prompt = f"""
-다음 문장의 맞춤법과 띄어쓰기를 모두 교정해줘. 원래 문장은 그대로 두지 말고 수정된 문장만 출력해줘:
+            # 2단계: 맞춤법 교정
+            result = spell_checker.check(spaced)
 
-{text}
-"""
-
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.2,
-            )
-
-            corrected_text = response.choices[0].message.content.strip()
-
-            st.subheader("✅ 수정된 문장:")
-            st.write(corrected_text)
+            if result:
+                corrected = result.checked
+                st.subheader("✅ 교정 결과:")
+                st.write(corrected)
+            else:
+                st.error("맞춤법 교정 실패: 결과 없음")
 
         except Exception as e:
             st.error(f"오류 발생: {e}")

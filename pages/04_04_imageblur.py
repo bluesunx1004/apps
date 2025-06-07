@@ -42,9 +42,9 @@ if uploaded_file:
 
     # 얼굴 블러 처리된 RGB 이미지
     blurred_image_rgb = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2RGB)
-    blurred_pil = Image.fromarray(blurred_image_rgb)
+    # PIL 이미지로 변환 및 복사 → 반드시 새 이미지로 전달
+    blurred_pil = Image.fromarray(blurred_image_rgb).copy()
 
-    st.subheader("🖍️ 사용자 선택 블러 (선택 사항)")
     canvas_result = st_canvas(
         fill_color="rgba(255, 0, 0, 0.3)",
         stroke_width=3,
@@ -53,7 +53,7 @@ if uploaded_file:
         height=blurred_pil.height,
         width=blurred_pil.width,
         drawing_mode="rect",
-        key="canvas",
+        key="canvas"
     )
 
     # 2. 사용자가 지정한 영역 추가 블러 처리

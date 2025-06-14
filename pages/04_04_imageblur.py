@@ -21,7 +21,7 @@ if uploaded_file is not None:
     image_cv = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
 
     # 얼굴 검출 (OpenCV DNN)
-    blob = cv2.dnn.blobFromImage(image_cv, 1.0, (300, 300), [104, 117, 123], False, False)
+    blob = cv2.dnn.blobFromImage(image_cv, 1.0, (900, 900), [104, 117, 123], False, False)
     net.setInput(blob)
     detections = net.forward()
     faces = []

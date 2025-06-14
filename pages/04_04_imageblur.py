@@ -19,11 +19,13 @@ if uploaded_file is not None:
     image_np = np.array(image)
     image_cv = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
 
-    # 얼굴 감지
-    faces = face_cascade.detectMultiScale(image_cv, scaleFactor=1.1, minNeighbors=5)
+    # 얼굴 감지 (scaleFactor와 minNeighbors 조정)
+    faces = face_cascade.detectMultiScale(image_cv, scaleFactor=1.05, minNeighbors=4)
+
+    st.write(f"감지된 얼굴 수: {len(faces)}")
 
     for (x, y, w, h) in faces:
-        # 패딩 추가 (얼굴 주변 20%씩 확대)
+        # 패딩 추가
         pad = int(0.2 * w)
         x1 = max(x - pad, 0)
         y1 = max(y - pad, 0)
@@ -31,7 +33,13 @@ if uploaded_file is not None:
         y2 = min(y + h + pad, image_cv.shape[0])
 
         face_region = image_cv[y1:y2, x1:x2]
-        blurred = cv2.GaussianBlur(face_region, (blur_strength, blur_strength), 30)
+
+        # 블러 커널 크기 조정 (영역보다 큰 커널이면 에러 발생)
+        k = blur_strength
+        if face_region.shape[0] < k or face_region.shape[1] < k:
+            k = min(face_region.shape[0] | 1, face_region.shape[1] | 1)  # 가장 가까운 홀수로 조정
+
+        blurred = cv2.GaussianBlur(face_region, (k, k), 30)
         image_cv[y1:y2, x1:x2] = blurred
 
     # RGB 변환 및 출력

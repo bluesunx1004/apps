@@ -1,18 +1,10 @@
-import streamlit as st
 from hanspell import spell_checker
 
-st.title("한글 띄어쓰기 & 맞춤법 교정 앱")
-
-text = st.text_area("교정할 문장을 입력하세요:", height=200)
-if st.button("교정하기"):
-    if text.strip():
-        try:
-            result = spell_checker.check(text)
-            st.write("**교정 결과:**")
-            st.write(result.checked)
-            st.write("**수정된 부분:**")
-            st.write(result.errors)
-        except Exception as e:
-            st.error(f"맞춤법 검사 중 오류가 발생했습니다: {e}")
-    else:
-        st.warning("문장을 입력해주세요!")
+text = "안녕하세요. 이것은 테스트 문장입니다."
+try:
+    result = spell_checker.check(text)
+    checked_text = result.checked
+except Exception as e:
+    checked_text = text
+    error_message = str(e)
+    print(error_message)  # 또는 st.error(error_message) 등으로 출력

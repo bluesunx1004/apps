@@ -1,53 +1,51 @@
 import streamlit as st
-import cv2
+import face_recognition
 import numpy as np
+import cv2
 from PIL import Image
 import io
 
-# Haar Cascade 모델 로드
-face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-
-st.title("얼굴 블러 처리 앱")
+st.title("얼굴 블러 처리 앱 (딥러닝 기반)")
 
 uploaded_file = st.file_uploader("이미지를 업로드하세요", type=["jpg", "jpeg", "png"])
 
-# 블러 강도 슬라이더 (커널 크기)
-blur_strength = st.slider("블러 강도", min_value=15, max_value=101, step=2, value=51)
+blur_strength = st.slider("블러 강도 (커널 크기)", min_value=15, max_value=101, step=2, value=51)
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file).convert('RGB')
+    image = Image.open(uploaded_file).convert("RGB")
     image_np = np.array(image)
-    image_cv = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
 
-    # 얼굴 감지 (scaleFactor와 minNeighbors 조정)
-    faces = face_cascade.detectMultiScale(image_cv, scaleFactor=1.05, minNeighbors=4)
+    # 얼굴 위치 찾기 (top, right, bottom, left)
+    face_locations = face_recognition.face_locations(image_np)
 
-    st.write(f"감지된 얼굴 수: {len(faces)}")
+    st.write(f"감지된 얼굴 수: {len(face_locations)}")
 
-    for (x, y, w, h) in faces:
+    for face in face_locations:
+        top, right, bottom, left = face
+
         # 패딩 추가
-        pad = int(0.2 * w)
-        x1 = max(x - pad, 0)
-        y1 = max(y - pad, 0)
-        x2 = min(x + w + pad, image_cv.shape[1])
-        y2 = min(y + h + pad, image_cv.shape[0])
+        pad_x = int(0.2 * (right - left))
+        pad_y = int(0.2 * (bottom - top))
 
-        face_region = image_cv[y1:y2, x1:x2]
+        x1 = max(left - pad_x, 0)
+        y1 = max(top - pad_y, 0)
+        x2 = min(right + pad_x, image_np.shape[1])
+        y2 = min(bottom + pad_y, image_np.shape[0])
 
-        # 블러 커널 크기 조정 (영역보다 큰 커널이면 에러 발생)
+        face_region = image_np[y1:y2, x1:x2]
+
+        # 블러 커널 크기 유효성 체크
         k = blur_strength
         if face_region.shape[0] < k or face_region.shape[1] < k:
-            k = min(face_region.shape[0] | 1, face_region.shape[1] | 1)  # 가장 가까운 홀수로 조정
+            k = min(face_region.shape[0] | 1, face_region.shape[1] | 1)  # 가장 가까운 홀수
 
         blurred = cv2.GaussianBlur(face_region, (k, k), 30)
-        image_cv[y1:y2, x1:x2] = blurred
+        image_np[y1:y2, x1:x2] = blurred
 
-    # RGB 변환 및 출력
-    result_image = cv2.cvtColor(image_cv, cv2.COLOR_BGR2RGB)
-    st.image(result_image, caption="블러 처리된 이미지", use_column_width=True)
+    st.image(image_np, caption="블러 처리된 이미지", use_column_width=True)
 
-    # 다운로드 버튼용: 이미지 바이너리 저장
-    result_pil = Image.fromarray(result_image)
+    # 이미지 저장
+    result_pil = Image.fromarray(image_np)
     buf = io.BytesIO()
     result_pil.save(buf, format="PNG")
     byte_im = buf.getvalue()

@@ -15,3 +15,4 @@ opencv-python-headless==4.9.0.80
 numpy
 Pillow
 streamlit-drawable-canvas==0.9.2
+face_recognition

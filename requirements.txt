@@ -8,4 +8,4 @@ PyMuPDF>=1.23.20
 python-pptx>=0.6.21
 qrcode>=7.4.2
 opencv-contrib-python-headless
-py-hanspell
+git+https://github.com/Seokhyeon-Park/hanspell.git

@@ -10,7 +10,7 @@ configFile = "opencv_face_detector.pbtxt"
 net = cv2.dnn.readNetFromTensorflow(modelFile, configFile)
 
 def detect_faces_dnn(image_cv):
-    blob = cv2.dnn.blobFromImage(image_cv, 1.0, (600, 600), [104, 117, 123], False, False)
+    blob = cv2.dnn.blobFromImage(image_cv, 1.0, (900, 900), [104, 117, 123], False, False)
     net.setInput(blob)
     detections = net.forward()
     faces = []
